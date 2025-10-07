@@ -1,0 +1,61 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python (export / tooling)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.venv/
+venv/
+env/
+.mypy_cache/
+.pytest_cache/
+
+# Model / cache artifacts (keep committed reference models but ignore temp)
+models/**/tmp/
+models/**/checkpoint*/
+models/**/logs/
+*.ckpt
+*.onnx
+*.bin
+*.safetensors
+
+# Logs / reports
+*.log
+logs/
+reports/
+
+# Editor / misc
+.vscode/
+*.swp
+*.swo
+*.tmp
+~$*
+
+# Archive & data dumps
+*.tar
+*.tar.gz
+*.zip
+*.7z
+*.ptl
+
+# JVM diagnostic dumps
+hs_err_pid*.log
+replay_pid*.log
