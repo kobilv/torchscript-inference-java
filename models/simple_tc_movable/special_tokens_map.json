@@ -1,0 +1,22 @@
+{
+  "unk_token": {
+    "id": 1,
+    "content": "[UNK]"
+  },
+  "pad_token": {
+    "id": 0,
+    "content": "[PAD]"
+  },
+  "cls_token": {
+    "id": 2,
+    "content": "[CLS]"
+  },
+  "sep_token": {
+    "id": 3,
+    "content": "[SEP]"
+  },
+  "mask_token": {
+    "id": 4,
+    "content": "[MASK]"
+  }
+}

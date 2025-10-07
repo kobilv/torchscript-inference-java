@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.example'
+version = '0.1.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri('https://publish.djl.ai/maven')
+        content { includeGroup 'ai.djl.pytorch' }
+    }
+}
+
+dependencies {
+    implementation platform('ai.djl:bom:0.28.0')
+    implementation 'ai.djl:api'
+
+    // PyTorch engine; natives will be downloaded at runtime by DJL
+    implementation 'ai.djl.pytorch:pytorch-engine'
+
+    // Logging
+    implementation 'org.slf4j:slf4j-simple:2.0.13'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.3'
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+application {
+    mainClass = 'com.example.inference.InferenceApp'
+}
+
+// Convenience run tasks
+tasks.register('runAuto', JavaExec) {
+    group = 'application'
+    description = 'Run inference with auto device selection (GPU if available, otherwise CPU)'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = application.mainClass
+}
+
+tasks.register('runCpu', JavaExec) {
+    group = 'application'
+    description = 'Run inference on CPU'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = application.mainClass
+    args '--device=cpu'
+}
+
+tasks.register('runGpu', JavaExec) {
+    group = 'application'
+    description = 'Run inference on GPU (index 0 by default)'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = application.mainClass
+    args '--device=gpu'
+}
+
+tasks.register('runGpuIndex', JavaExec) {
+    group = 'application'
+    description = 'Run inference on a specific GPU index (usage: -PgpuIndex=1)'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = application.mainClass
+    doFirst {
+        def idx = project.findProperty('gpuIndex') ?: '0'
+        args '--device=gpu', "--gpu-index=${idx}"
+    }
+}
