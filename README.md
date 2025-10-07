@@ -61,21 +61,6 @@ Use CLI flags to choose model/device. (Defaults are defined in `InferenceApp.Con
 ```
 
 ---
-### Exporting A Device-Agnostic TorchScript Model
-To ensure a single `.pt` works across CPU and any GPU index:
-1. Prefer `torch.jit.script` over `torch.jit.trace` (tracing can bake in CPU tensors).
-2. Create auxiliary tensors (masks, position ids, segment ids) using `input_ids.new_*` or by moving them to `input_ids.device`.
-3. Register static positional buffers with `register_buffer` (if needed) instead of hardcoding CPU.
-4. Avoid Python constructs unsupported by TorchScript (complex list comprehensions with conditionals, `**kwargs` expansion).
-5. Validate portability:
-	```python
-	for i in range(torch.cuda.device_count()):
-		 m = torch.jit.load("model.pt", map_location=f"cuda:{i}").eval()
-		 x = torch.randint(0, vocab_size, (1, seq_len), device=f"cuda:{i}")
-		 _ = m(x, x.new_ones(x.shape), x.new_zeros(x.shape))
-	```
-
----
 ### Adding Your Own Model
 1. Place `your_model.pt` under `models/your_model/`
 2. Run:
@@ -85,32 +70,6 @@ To ensure a single `.pt` works across CPU and any GPU index:
 3. Adjust sequence length via `--seq-len=N` (default 16) to match your model’s expected input shape.
 
 ---
-### Translators
-Currently an identity translator passes raw NDList to/from the predictor. For real use cases (text, vision, audio), implement a `Translator` that:
-- Builds input tensors from domain objects in `processInput`
-- Decodes output tensors in `processOutput`
-
----
-### Troubleshooting
-| Issue | Likely Cause | Fix |
-|-------|--------------|-----|
-| Mixed CPU/GPU tensor error in attention mask | Traced model baked CPU constants | Re-export with pure scripting and input-device tensor creation |
-| Model loads on CPU when expecting GPU | `--device=auto` but no GPU visible | Force with `--device=gpu --gpu-index=0` and verify CUDA install |
-| Slow first inference | Native libs downloading / graph optimizer warmup | Re-run; add caching layer |
-
----
-### Roadmap / Ideas
-- Add tokenizer-driven translator for `simple_tc_movable`.
-- Example DistilBERT scripted NER export to contrast with non-scriptable large models.
-- Unit tests that spin up CPU and (mock) GPU device selection logic.
-
----
-### License
-Add your preferred license information here.
-
----
 ### Acknowledgements
 - DJL: https://djl.ai
 - PyTorch & TorchScript
-- (Optional) Hugging Face Transformers for architecture references
-
