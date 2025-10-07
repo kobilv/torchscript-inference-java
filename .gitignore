@@ -49,6 +49,8 @@ reports/
 *.tmp
 ~$*
 
+.github/*
+
 # Archive & data dumps
 *.tar
 *.tar.gz
